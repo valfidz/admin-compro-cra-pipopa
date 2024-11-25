@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export const PostsTable = () => {
     const tableItems = [
@@ -51,11 +52,12 @@ export const PostsTable = () => {
                     </p>
                 </div>
                 <div className="mt-3 md:mt-0">
-                    <button
+                    <Link
+                        to="/edit-post"
                         className="inline-block px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700 md:text-sm"
                     >
                         Add post
-                    </button>
+                    </Link>
                 </div>
             </div>
             <div className="mt-12 relative h-max overflow-auto">
