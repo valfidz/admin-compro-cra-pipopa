@@ -13,7 +13,10 @@ const PostForm = () => {
     metaTitle: "",
     metaDescription: "",
     keywords: "",
+    status: "draft" // Add default status
   });
+
+  const be_url = process.env.REACT_APP_BE_SITE;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +49,7 @@ const PostForm = () => {
     });
 
     try {
-      const response = await axios.post("http://localhost:5243/posts", data, {
+      const response = await axios.post(`${be_url}/api/posts`, data, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -58,6 +61,7 @@ const PostForm = () => {
         alert("Failed to create post.");
       }
     } catch (error) {
+        console.log("error", error)
       console.error("Error submitting the form:", error);
       alert("An error occurred while submitting the form.");
     }
@@ -82,6 +86,40 @@ const PostForm = () => {
           value={formData.title}
           onChange={handleInputChange}
         />
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-2">Post Status</label>
+        <div className="flex gap-4">
+          <div className="flex items-center">
+            <input
+              type="radio"
+              id="draft"
+              name="status"
+              value="draft"
+              checked={formData.status === "draft"}
+              onChange={handleInputChange}
+              className="mr-2"
+            />
+            <label htmlFor="draft" className="text-sm">
+              Draft
+            </label>
+          </div>
+          <div className="flex items-center">
+            <input
+              type="radio"
+              id="published"
+              name="status"
+              value="published"
+              checked={formData.status === "published"}
+              onChange={handleInputChange}
+              className="mr-2"
+            />
+            <label htmlFor="published" className="text-sm">
+              Published
+            </label>
+          </div>
+        </div>
       </div>
 
       <div className="mb-4">
