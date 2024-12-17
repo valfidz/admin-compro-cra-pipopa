@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 export const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
+    const [messageColor, setMessageColor] = useState('');
 
     const be_site = process.env.REACT_APP_BE_SITE
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,11 +23,17 @@ export const Login = () => {
 
             setMessage(response.data.message)
 
+            setMessageColor('text-green-600')
+
             Cookies.set('token', response.data.token, { expires: 1 });
+
+            navigate('/');
         } catch (error) {
             console.error('Login failed: ', error);
 
             setMessage(error.message?.data?.message || 'Login failed. Please try again');
+
+            setMessageColor('text-red-600')
         }
     }
 
@@ -71,6 +80,7 @@ export const Login = () => {
                     >
                         Sign in
                     </button>
+                    { message && <div className={`text-center ${messageColor} mt-3`}>{message}</div> }
                     <div className="text-center">
                         <a href="javascript:void(0)" className="hover:text-indigo-600">Forgot password?</a>
                     </div>

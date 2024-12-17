@@ -1,10 +1,18 @@
 import React, { useState } from "react";
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = (props) => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
+    const navigate = useNavigate();
 
     const toggleSidebar = () => {
         setSidebarOpen(!isSidebarOpen);
+    };
+
+    const handleLogout = () => {
+        Cookies.remove('token'); // Remove the token from cookies
+        navigate('/login'); // Redirect to the login page
     };
 
     const navigation = [
@@ -23,7 +31,8 @@ const Sidebar = (props) => {
             name: 'Logout',
             icon: <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
-            </svg>
+            </svg>,
+            action: handleLogout
         }
     ];
 
@@ -63,10 +72,10 @@ const Sidebar = (props) => {
                             <ul className="px-4 pb-4 text-sm font-medium">
                                 {navsFooter.map((item, idx) => (
                                     <li key={idx}>
-                                        <a href={item.href} className="flex items-center gap-x-2 text-gray-600 p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 duration-150">
+                                        <button onClick={item.action} className="flex items-center gap-x-2 text-gray-600 p-2 rounded-lg hover:bg-gray-50 active:bg-gray-100 duration-150">
                                             <div className="text-gray-500">{item.icon}</div>
                                             {item.name}
-                                        </a>
+                                        </button>
                                     </li>
                                 ))}
                             </ul>
