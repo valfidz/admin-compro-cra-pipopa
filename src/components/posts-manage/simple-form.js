@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import Failed from "../alerts/failAlert";
 
 const PostForm = () => {
   const [formData, setFormData] = useState({
@@ -10,11 +13,16 @@ const PostForm = () => {
     featuredImage: null,
     content: "",
     author: "",
-    metaTitle: "",
-    metaDescription: "",
+    meta_title: "",
+    meta_description: "",
     keywords: "",
     status: "draft" // Add default status
   });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [showError, setShowError] = useState(false);
+  const navigate = useNavigate();
+
+  const authToken = Cookies.get('token')
 
   const be_url = process.env.REACT_APP_BE_SITE;
 
@@ -51,185 +59,193 @@ const PostForm = () => {
     try {
       const response = await axios.post(`${be_url}/api/posts`, data, {
         headers: {
+          "Authorization": `Bearer ${authToken}`,
           "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.status === 200 || response.status === 201) {
-        alert("Post created successfully!");
+        // alert("Post created successfully!");
+        sessionStorage.setItem('postNotification', 'true');
+
+        navigate('/manage-posts')
       } else {
         alert("Failed to create post.");
       }
     } catch (error) {
-        console.log("error", error)
       console.error("Error submitting the form:", error);
-      alert("An error occurred while submitting the form.");
+      setErrorMessage("An error occured while submitting the form.");
+      setShowError(true);
+    //   alert("An error occurred while submitting the form.");
     }
   };
 
   return (
-    <form
-      className="max-w-3xl mx-auto p-4 bg-white shadow-md rounded-md"
-      onSubmit={handleSubmit}
-    >
-      <h2 className="text-2xl font-bold mb-4">Create Post</h2>
+    <>
+        {showError && <Failed message={errorMessage} />}
+        <form
+        className="max-w-3xl mx-auto p-4 bg-white shadow-md rounded-md"
+        onSubmit={handleSubmit}
+        >
+        <h2 className="text-2xl font-bold mb-4">Create Post</h2>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1" htmlFor="title">
-          Post Title
-        </label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={formData.title}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-2">Post Status</label>
-        <div className="flex gap-4">
-          <div className="flex items-center">
-            <input
-              type="radio"
-              id="draft"
-              name="status"
-              value="draft"
-              checked={formData.status === "draft"}
-              onChange={handleInputChange}
-              className="mr-2"
-            />
-            <label htmlFor="draft" className="text-sm">
-              Draft
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="title">
+            Post Title
             </label>
-          </div>
-          <div className="flex items-center">
             <input
-              type="radio"
-              id="published"
-              name="status"
-              value="published"
-              checked={formData.status === "published"}
-              onChange={handleInputChange}
-              className="mr-2"
+            type="text"
+            id="title"
+            name="title"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={formData.title}
+            onChange={handleInputChange}
             />
-            <label htmlFor="published" className="text-sm">
-              Published
-            </label>
-          </div>
         </div>
-      </div>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1" htmlFor="category">
-          Category
-        </label>
-        <input
-          type="text"
-          id="category"
-          name="category"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={formData.category}
-          onChange={handleInputChange}
-        />
-      </div>
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-2">Post Status</label>
+            <div className="flex gap-4">
+            <div className="flex items-center">
+                <input
+                type="radio"
+                id="draft"
+                name="status"
+                value="draft"
+                checked={formData.status === "draft"}
+                onChange={handleInputChange}
+                className="mr-2"
+                />
+                <label htmlFor="draft" className="text-sm">
+                Draft
+                </label>
+            </div>
+            <div className="flex items-center">
+                <input
+                type="radio"
+                id="published"
+                name="status"
+                value="published"
+                checked={formData.status === "published"}
+                onChange={handleInputChange}
+                className="mr-2"
+                />
+                <label htmlFor="published" className="text-sm">
+                Published
+                </label>
+            </div>
+            </div>
+        </div>
 
-      <div className="mb-4">
-        <label
-          className="block text-sm font-medium mb-1"
-          htmlFor="featuredImage"
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="category">
+            Category
+            </label>
+            <input
+            type="text"
+            id="category"
+            name="category"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={formData.category}
+            onChange={handleInputChange}
+            />
+        </div>
+
+        <div className="mb-4">
+            <label
+            className="block text-sm font-medium mb-1"
+            htmlFor="featuredImage"
+            >
+            Featured Image
+            </label>
+            <input
+            type="file"
+            id="featuredImage"
+            name="featuredImage"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            onChange={handleFileChange}
+            />
+        </div>
+
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="content">
+            Post Content
+            </label>
+            <ReactQuill
+            value={formData.content}
+            onChange={handleQuillChange}
+            className="bg-white"
+            />
+        </div>
+
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="author">
+            Author
+            </label>
+            <input
+            type="text"
+            id="author"
+            name="author"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={formData.author}
+            onChange={handleInputChange}
+            />
+        </div>
+
+        <h2 className="text-2xl font-bold mb-4">SEO Metadata</h2>
+
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="meta_title">
+            Meta Title
+            </label>
+            <input
+            type="text"
+            id="meta_title"
+            name="meta_title"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={formData.meta_title}
+            onChange={handleInputChange}
+            />
+        </div>
+
+        <div className="mb-4">
+            <label
+            className="block text-sm font-medium mb-1"
+            htmlFor="meta_description"
+            >
+            Meta Description
+            </label>
+            <textarea
+            id="meta_description"
+            name="meta_description"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={formData.meta_description}
+            onChange={handleInputChange}
+            ></textarea>
+        </div>
+
+        <div className="mb-4">
+            <label className="block text-sm font-medium mb-1" htmlFor="keywords">
+            Keywords
+            </label>
+            <input
+            type="text"
+            id="keywords"
+            name="keywords"
+            className="w-full p-2 border border-gray-300 rounded-md"
+            value={formData.keywords}
+            onChange={handleInputChange}
+            />
+        </div>
+
+        <button
+            type="submit"
+            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
         >
-          Featured Image
-        </label>
-        <input
-          type="file"
-          id="featuredImage"
-          name="featuredImage"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          onChange={handleFileChange}
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1" htmlFor="content">
-          Post Content
-        </label>
-        <ReactQuill
-          value={formData.content}
-          onChange={handleQuillChange}
-          className="bg-white"
-        />
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1" htmlFor="author">
-          Author
-        </label>
-        <input
-          type="text"
-          id="author"
-          name="author"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={formData.author}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <h2 className="text-2xl font-bold mb-4">SEO Metadata</h2>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1" htmlFor="metaTitle">
-          Meta Title
-        </label>
-        <input
-          type="text"
-          id="metaTitle"
-          name="metaTitle"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={formData.metaTitle}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <div className="mb-4">
-        <label
-          className="block text-sm font-medium mb-1"
-          htmlFor="metaDescription"
-        >
-          Meta Description
-        </label>
-        <textarea
-          id="metaDescription"
-          name="metaDescription"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={formData.metaDescription}
-          onChange={handleInputChange}
-        ></textarea>
-      </div>
-
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1" htmlFor="keywords">
-          Keywords
-        </label>
-        <input
-          type="text"
-          id="keywords"
-          name="keywords"
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={formData.keywords}
-          onChange={handleInputChange}
-        />
-      </div>
-
-      <button
-        type="submit"
-        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600"
-      >
-        Submit
-      </button>
-    </form>
+            Submit
+        </button>
+        </form>
+    </>
   );
 };
 
