@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
@@ -18,6 +18,8 @@ const PostForm = () => {
     keywords: "",
     status: "draft" // Add default status
   });
+  const [categories, setCategories] = useState([]);
+  const [previewImage, setPreviewImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [showError, setShowError] = useState(false);
   const navigate = useNavigate();
@@ -25,6 +27,24 @@ const PostForm = () => {
   const authToken = Cookies.get('token')
 
   const be_url = process.env.REACT_APP_BE_SITE;
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get(`${be_url}/api/categories`);
+            setCategories(response.data.result);
+            console.log("categories", response.data.result)
+        } catch (error) {
+            console.error("Error fetching categories:", error);
+        }
+    };
+
+    fetchCategories();
+  }, [be_url]);
+
+  const capitalizeLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -39,6 +59,7 @@ const PostForm = () => {
       ...prev,
       featuredImage: e.target.files[0],
     }));
+    setPreviewImage(URL.createObjectURL(e.target.files[0]));
   };
 
   const handleQuillChange = (value) => {
@@ -141,14 +162,20 @@ const PostForm = () => {
             <label className="block text-sm font-medium mb-1" htmlFor="category">
             Category
             </label>
-            <input
-            type="text"
-            id="category"
-            name="category"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            value={formData.category}
-            onChange={handleInputChange}
-            />
+            <select
+                id="category"
+                name="category"
+                className="w-full p-2 border border-gray-300 rounded-md"
+                value={formData.category}
+                onChange={handleInputChange}
+            >
+                <option value="">Select a category</option>
+                {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                        {capitalizeLetter(category.name)}
+                    </option>
+                ))}
+            </select>
         </div>
 
         <div className="mb-4">
@@ -165,9 +192,16 @@ const PostForm = () => {
             className="w-full p-2 border border-gray-300 rounded-md"
             onChange={handleFileChange}
             />
+            {previewImage && (
+                <img
+                    src={previewImage}
+                    alt="Preview"
+                    className="mt-2 max-h-48 border border-gray-300 rounded-md"
+                />
+            )}
         </div>
 
-        <div className="mb-4">
+        <div className="mb-14">
             <label className="block text-sm font-medium mb-1" htmlFor="content">
             Post Content
             </label>
@@ -175,6 +209,7 @@ const PostForm = () => {
             value={formData.content}
             onChange={handleQuillChange}
             className="bg-white"
+            style={{ height: "300px" }}
             />
         </div>
 
