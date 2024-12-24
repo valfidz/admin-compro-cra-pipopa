@@ -6,7 +6,7 @@ export const Registration = () => {
                     <img src="https://floatui.com/logo.svg" width={150} className="mx-auto" />
                     <div className="mt-5 space-y-2">
                         <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Create an account</h3>
-                        <p className="">Already have an account? <a href="javascript:void(0)" className="font-medium text-indigo-600 hover:text-indigo-500">Log in</a></p>
+                        <p className="">Already have an account? <a href="" className="font-medium text-indigo-600 hover:text-indigo-500">Log in</a></p>
                     </div>
                 </div>
                 <div className="bg-white shadow p-4 py-6 sm:p-6 sm:rounded-lg">

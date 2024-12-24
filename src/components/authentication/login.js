@@ -44,7 +44,7 @@ export const Login = () => {
                     <img src="/horizontal_logo.png" width={200} className="mx-auto" />
                     <div className="mt-5 space-y-2">
                         <h3 className="text-gray-800 text-2xl font-bold sm:text-3xl">Log in to your account</h3>
-                        <p className="">Don't have an account? <a href="javascript:void(0)" className="font-medium text-indigo-600 hover:text-indigo-500">Sign up</a></p>
+                        <p className="">Don't have an account? <a href="" className="font-medium text-indigo-600 hover:text-indigo-500">Sign up</a></p>
                     </div>
                 </div>
                 <form
@@ -82,7 +82,7 @@ export const Login = () => {
                     </button>
                     { message && <div className={`text-center ${messageColor} mt-3`}>{message}</div> }
                     <div className="text-center">
-                        <a href="javascript:void(0)" className="hover:text-indigo-600">Forgot password?</a>
+                        <a href="" className="hover:text-indigo-600">Forgot password?</a>
                     </div>
                 </form>
             </div>
