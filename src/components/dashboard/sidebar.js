@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
 const Sidebar = (props) => {
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
+    const user = JSON.parse(Cookies.get('user'));
 
     const toggleSidebar = () => {
         setSidebarOpen(!isSidebarOpen);
@@ -81,11 +82,11 @@ const Sidebar = (props) => {
                             </ul>
                             <div className="py-4 px-4 border-t">
                                 <div className="flex items-center gap-x-4">
-                                    <img src="https://randomuser.me/api/portraits/women/79.jpg" className="w-12 h-12 rounded-full" alt="User profile" />
+                                    <img src="/vertikal_logo.jpg" className="w-12 h-12 rounded-full" alt="User profile" />
                                     <div>
-                                        <span className="block text-gray-700 text-sm font-semibold">Alivika Tony</span>
+                                        <span className="block text-gray-700 text-sm font-semibold">{user.username}</span>
                                         <a href="" className="block mt-px text-gray-600 hover:text-indigo-600 text-xs">
-                                            View profile
+                                            {user.email}
                                         </a>
                                     </div>
                                 </div>

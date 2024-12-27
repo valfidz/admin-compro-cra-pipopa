@@ -1,12 +1,12 @@
-import { EditablePost } from "../components/posts-manage/edit-posts";
-import PostEditForm from "../components/posts-manage/edit-post-dynamic";
-import PostForm from "../components/posts-manage/simple-form";
+import EditablePost from "../components/posts-manage/edit-posts";
 import Sidebar from "../components/dashboard/sidebar";
+import { useParams } from "react-router-dom";
 
 export const EditPostForm = () => {
+    const { id } = useParams();
     return (
         <>
-            <Sidebar childComponent={<PostForm />} />
+            <Sidebar childComponent={<EditablePost postId={id} />} />
         </>
     ) 
 }

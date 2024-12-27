@@ -165,7 +165,7 @@ export const PostsTable = () => {
                     </div>
                     <div className="mt-3 md:mt-0">
                         <Link
-                            to="/edit-post"
+                            to="/create-post"
                             className="inline-flex items-center px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700 md:text-sm"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6 mr-2">

@@ -5,6 +5,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import Failed from "../alerts/failAlert";
+import { Link } from "react-router-dom";
 
 const PostForm = () => {
   const [formData, setFormData] = useState({
@@ -104,6 +105,30 @@ const PostForm = () => {
   return (
     <>
         {showError && <Failed message={errorMessage} />}
+
+        <div className="mb-6">
+            <Link
+            to="/manage-posts"
+            className="inline-flex items-center gap-2 text-sm text-white bg-green-500 hover:bg-green-700 px-4 py-2 rounded-lg transition-colors duration-150"
+            >
+            <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                strokeWidth={2} 
+                stroke="currentColor" 
+                className="w-5 h-5"
+            >
+                <path 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" 
+                />
+            </svg>
+            Back to Posts
+            </Link>
+        </div>
+
         <form
         className="max-w-3xl mx-auto p-4 bg-white shadow-md rounded-md"
         onSubmit={handleSubmit}

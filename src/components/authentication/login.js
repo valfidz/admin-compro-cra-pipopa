@@ -26,6 +26,7 @@ export const Login = () => {
             setMessageColor('text-green-600')
 
             Cookies.set('token', response.data.token, { expires: 1 });
+            Cookies.set('user', JSON.stringify(response.data.user), { expires: 1 });
 
             navigate('/');
         } catch (error) {

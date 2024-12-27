@@ -8,6 +8,7 @@ import { LoginPage } from './pages/login';
 import { RegistrationPage } from './pages/registration';
 import { RouteAuth } from './auth/routeAuth';
 import { NotFoundPage } from './pages/notFound';
+import { CreatePostForm } from './pages/createPost';
 
 function App() {
   return (
@@ -19,6 +20,11 @@ function App() {
               <Dashboard />
             </RouteAuth>
             } />
+          <Route path='/create-post' element={
+            <RouteAuth>
+              <CreatePostForm />
+            </RouteAuth>
+          } />
           <Route path='/manage-posts' element={
             <RouteAuth>
               <PostsManage />
@@ -29,7 +35,7 @@ function App() {
               <PostView />
             </RouteAuth>
             } />
-          <Route path='/edit-post' element={
+          <Route path='/edit-post/:id' element={
             <RouteAuth>
               <EditPostForm />
             </RouteAuth>
