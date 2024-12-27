@@ -1,76 +1,121 @@
-export const Post = () => {
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import Cookies from "js-cookie";
+import DOMPurify from "dompurify";
+
+export const Post = (props) => {
+    const postId = props.postId;
+    const be_site = process.env.REACT_APP_BE_SITE;
+    const authToken = Cookies.get('token');
+    const [postDetail, setPostDetail] = useState({});
+    const [imageName, setImageName] = useState('');
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchPostDetails = async () => {
+            try {
+                const response = await axios.get(`${be_site}/api/posts/${postId}`, {
+                    headers: {'Authorization': `Bearer ${authToken}`}
+                });
+        
+                if (isMounted) {
+                    setPostDetail(response.data);
+                    setImageName(response.data.featured_image);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.error("Error fetching post", error)
+                }
+            }
+        }
+
+        fetchPostDetails();
+
+        return () => {
+            isMounted = false;
+        }
+    }, [postId, be_site, authToken]);
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    };
+
+    const sanitizedContent = (content) => {
+        return DOMPurify.sanitize(content);
+    }
+
     return (
-        <>
-            <div className="max-w-screen-xl mx-auto">
-                <main className="mt-10">
-                    <div 
-                        className="mb-4 md:mb-0 w-full max-w-screen-md mx-auto relative h-96"
-                    >
-                        <div 
-                            className="absolute left-0 bottom-0 w-full h-full z-10"
-                            style={{
-                                backgroundImage: 'linear-gradient(180deg,transparent,rgba(0,0,0,.7))'
-                            }}
-                        />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <main className="pt-8 pb-16">
+                {/* Featured Image Section */}
+                <div className="relative rounded-lg overflow-hidden mb-12">
+                    <div className="h-64 sm:h-72 md:h-80 relative">
                         <img 
-                            src="/api/placeholder/2100/800"
+                            src={`${be_site}/api/image/${imageName}`}
                             alt="Featured post image"
-                            className="absolute left-0 top-0 w-full h-full z-0 object-cover" 
+                            className="w-full h-full object-cover rounded-lg"
                         />
-                        <div className="p-4 absolute bottom-0 left-0 z-20">
-                            <a href="#"
-                                className="px-4 py-1 bg-black text-gray-200 inline-flex items-center justify-center mb-2">
-                                Nutrition
-                            </a>
-                            <h2 className="text-4xl font-semibold text-gray-100 leading-tight">
-                                Pellentesque a consectetur velit, ac molestie ipsum. Donec sodales, massa et auctor.
-                            </h2>
-                            <div className="flex mt-3">
+                        <div 
+                            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent rounded-lg"
+                        />
+                    </div>
+                    
+                    {/* Content overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
+                        <div className="max-w-3xl">
+                            <span className="inline-flex px-3 py-1 text-sm font-medium text-gray-200 bg-black/80 rounded-full mb-3">
+                                {postDetail.category_id}
+                            </span>
+                            
+                            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white mb-4 break-words leading-snug">
+                                {postDetail.title}
+                            </h1>
+                            
+                            <div className="flex items-center">
                                 <img 
-                                    src="/api/placeholder/100/100"
+                                    src="/vertikal_logo.jpg"
                                     alt="Author profile"
-                                    className="h-10 w-10 rounded-full mr-2 object-cover" 
+                                    className="h-8 w-8 sm:h-10 sm:w-10 rounded-full mr-3 object-cover border border-white/50" 
                                 />
                                 <div>
-                                    <p className="font-semibold text-gray-200 text-sm"> Mike Sullivan </p>
-                                    <p className="font-semibold text-gray-400 text-xs"> 14 Aug </p>
+                                    <p className="text-white font-medium">
+                                        {postDetail.author}
+                                    </p>
+                                    <p className="text-gray-300 text-sm">
+                                        {formatDate(postDetail.created_at)}
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div className="px-4 lg:px-0 mt-12 text-gray-700 max-w-screen-md mx-auto text-lg leading-relaxed">
-                        <p className="pb-6">Advantage old had otherwise sincerity dependent additions. It in adapted natural hastily is
-                        justice. Six draw you him full not mean evil. Prepare garrets it expense windows shewing do an. She projection advantages
-                        resolution son indulgence. Part sure on no long life am at ever. In songs above he as drawn to. Gay was
-                        outlived peculiar rendered led six.</p>
+                {/* Article Content */}
+                <article className="max-w-3xl mx-auto">
+                    <div
+                        dangerouslySetInnerHTML={{ 
+                            __html: sanitizedContent(postDetail.content) 
+                        }}
+                        className="prose prose-lg max-w-none text-gray-800 leading-relaxed
+                            prose-headings:text-gray-900 prose-headings:font-semibold
+                            prose-p:text-gray-800 prose-p:leading-relaxed
+                            prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
+                            prose-strong:text-gray-900
+                            prose-blockquote:text-gray-700 prose-blockquote:border-l-gray-300
+                            prose-ul:text-gray-800 prose-ol:text-gray-800
+                            prose-li:marker:text-gray-500"
+                    />
+                </article>
+            </main>
+        </div>
+    );
+};
 
-                        <p className="pb-6">Difficulty on insensible reasonable in. From as went he they. Preference themselves me as
-                        thoroughly partiality considered on in estimating. Middletons acceptance discovered projecting so is so or. In or
-                        attachment inquietude remarkably comparison at an. Is surrounded prosperous stimulated am me discretion
-                        expression. But truth being state can she china widow. Occasional preference fat remarkably now projecting
-                        uncommonly dissimilar. Sentiments projection particular companions interested do at my delightful. Listening
-                        newspaper in advantage frankness to concluded unwilling.</p>
-
-                        <div className="border-l-4 border-gray-500 pl-4 mb-6 italic rounded">
-                            Sportsman do offending supported extremity breakfast by listening. Decisively advantages nor
-                            expression unpleasing she led met. Estate was tended ten boy nearer seemed. As so seeing latter he should thirty whence.
-                            Steepest speaking up attended it as. Made neat an on be gave show snug tore.
-                        </div>
-
-                        <h2 className="text-2xl text-gray-800 font-semibold mb-4 mt-4">Uneasy barton seeing remark happen his has</h2>
-
-                        <p className="pb-6">Guest it he tears aware as. Make my no cold of need. He been past in by my hard. Warmly thrown
-                        oh he common future. Otherwise concealed favourite frankness on be at dashwoods defective at. Sympathize interested
-                        simplicity at do projecting increasing terminated. As edward settle limits at in.</p>
-
-                        <p className="pb-6">Dashwood contempt on mr unlocked resolved provided of of. Stanhill wondered it it welcomed oh.
-                        Hundred no prudent he however smiling at an offence. If earnestly extremity he he propriety something admitting convinced
-                        ye. Pleasant in to although as if differed horrible. Mirth his quick its set front enjoy hoped had there. Who
-                        connection imprudence middletons too but increasing celebrated principles joy.</p>
-                    </div>
-                </main>
-            </div>
-        </>
-    )
-}
+export default Post;

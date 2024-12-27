@@ -24,7 +24,7 @@ function App() {
               <PostsManage />
             </RouteAuth>
             } />
-          <Route path='/post' element={
+          <Route path='/post/:id' element={
             <RouteAuth>
               <PostView />
             </RouteAuth>
