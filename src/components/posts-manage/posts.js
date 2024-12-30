@@ -151,7 +151,8 @@ export const Post = (props) => {
                                 prose-strong:text-gray-900
                                 prose-blockquote:text-gray-700 prose-blockquote:border-l-gray-300
                                 prose-ul:text-gray-800 prose-ol:text-gray-800
-                                prose-li:marker:text-gray-500"
+                                prose-li:marker:text-gray-500
+                                break-words"
                         />
                     </article>
                 </main>

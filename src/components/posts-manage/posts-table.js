@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import Success from "../alerts/successAlert";
 import Failed from "../alerts/failAlert";
 import ConfirmationDialog from "../confirmation/confirmation";
+import { Pagination } from "./pagination";
 
 export const PostsTable = () => {
     const [tableItems, setTableItems] = useState([]);
@@ -16,6 +17,16 @@ export const PostsTable = () => {
     const [notifMessage, setNotifMessage] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState(null);
+
+    // Pagination states
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Get current posts
+    const indexOfLastPost = currentPage * itemsPerPage;
+    const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+    const currentPosts = tableItems.slice(indexOfFirstPost, indexOfLastPost);
 
     const be_site = process.env.REACT_APP_BE_SITE;
     const authToken = Cookies.get('token');
@@ -50,12 +61,19 @@ export const PostsTable = () => {
         const fetchPost = async () => {
             try {
                 const response = await axios.get(`${be_site}/api/posts`, {
+                    params: {
+                        page: currentPage,
+                        limit: itemsPerPage
+                    },
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
                         'Content-Type': 'application/json'
                     }
                 });
-                setTableItems(response.data.posts);
+                if (response.data) {
+                    setTableItems(response.data.posts);
+                    setTotalItems(response.data.pagination.total);
+                }
             } catch (err) {
                 const errorMessage = err.response?.data?.message || "Failed to load posts. Please try again later";
                 setError(errorMessage);
@@ -75,7 +93,12 @@ export const PostsTable = () => {
             setError("No authentication token found. Please login.");
             setLoading(false);
         }
-    }, [authToken]);
+    }, [authToken, currentPage, itemsPerPage]);
+
+    const handlePageChange = (page) => {
+        setCurrentPage(parseInt(page));
+        setLoading(true);
+    }
 
     // const handleDelete = async (postId) => {
     //     if (window.confirm("Are you sure you want to delete this post?")) {
@@ -101,6 +124,13 @@ export const PostsTable = () => {
         return sentence;
     }
 
+    const capitalizeLetter = (string) => {
+        if (!string) {
+            return ''
+        }
+        return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
     const handleDelete = (postId) => {
         setDeletePostId(postId);
         setIsDialogOpen(true);
@@ -112,7 +142,31 @@ export const PostsTable = () => {
             await axios.delete(`${be_site}/api/posts/${deletePostId}`, {
                 headers: { Authorization: `Bearer ${authToken}` },
             });
-            setTableItems(tableItems.filter((item) => item.id !== deletePostId));
+
+            // Refresh the current page after deletion
+            const response = await axios.get(`${be_site}/api/posts`, {
+                params: {
+                    page: currentPage,
+                    limit: itemsPerPage
+                },
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data) {
+                setTableItems(response.data.posts);
+                setTotalItems(response.data.pagination.total);
+                
+                // If current page is empty after deletion and it's not the first page,
+                // go to previous page
+                if (response.data.posts.length === 0 && currentPage > 1) {
+                    setCurrentPage(currentPage - 1);
+                }
+            }
+
+            // setTableItems(tableItems.filter((item) => item.id !== deletePostId));
             setShowNotif(true);
             setNotifMessage("Post deleted successfully!");
         } catch (error) {
@@ -180,6 +234,7 @@ export const PostsTable = () => {
                         <thead className="text-gray-600 font-medium border-b">
                             <tr>
                                 <th className="py-3 pr-6">Title</th>
+                                <th className="py-3 pr-6">Caategory</th>
                                 <th className="py-3 pr-6">Date</th>
                                 <th className="py-3 pr-6">Status</th>
                                 <th className="py-3 pr-6">Author</th>
@@ -190,7 +245,12 @@ export const PostsTable = () => {
                         <tbody className="text-gray-600 divide-y">
                             {tableItems.map((item) => (
                                 <tr key={item.id}>
-                                    <td className="pr-6 py-4 whitespace-nowrap">{truncateSentence(item.title)}</td>
+                                    <td className="pr-6 py-4 whitespace-nowrap">
+                                        <div className="max-w-xs break-words text-wrap">
+                                            {item.title}
+                                        </div>
+                                    </td>
+                                    <td className="pr-6 py-4 whitespace-nowrap">{capitalizeLetter(item.category_name || 'Uncategorized')}</td>
                                     <td className="pr-6 py-4 whitespace-nowrap">{formatDate(item.created_at)}</td>
                                     <td className="pr-6 py-4 whitespace-nowrap">
                                         <span className={`px-3 py-2 rounded-full font-semibold text-xs ${
@@ -247,6 +307,12 @@ export const PostsTable = () => {
                         </tbody>
                     </table>
                 </div>
+                <Pagination
+                    currentPage={currentPage.toString()}
+                    itemsPerPage={itemsPerPage}
+                    totalItems={totalItems}
+                    onPageChange={handlePageChange}
+                />
             </div>
 
             <ConfirmationDialog
