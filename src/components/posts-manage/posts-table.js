@@ -21,6 +21,8 @@ export const PostsTable = () => {
     // Search states
     const [searchQuery, setSearchQuery] = useState('');
     const [searchField, setSearchField] = useState('all');
+    const [submittedSearchQuery, setSubmittedSearchQuery] = useState('');
+    const [submittedSearchField, setSubmittedSearchField] = useState('all');
 
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
@@ -28,9 +30,9 @@ export const PostsTable = () => {
     const [totalItems, setTotalItems] = useState(0);
 
     // Get current posts
-    const indexOfLastPost = currentPage * itemsPerPage;
-    const indexOfFirstPost = indexOfLastPost - itemsPerPage;
-    const currentPosts = tableItems.slice(indexOfFirstPost, indexOfLastPost);
+    // const indexOfLastPost = currentPage * itemsPerPage;
+    // const indexOfFirstPost = indexOfLastPost - itemsPerPage;
+    // const currentPosts = tableItems.slice(indexOfFirstPost, indexOfLastPost);
 
     const be_site = process.env.REACT_APP_BE_SITE;
     const authToken = Cookies.get('token');
@@ -68,8 +70,8 @@ export const PostsTable = () => {
                     params: {
                         page: currentPage,
                         limit: itemsPerPage,
-                        search: searchQuery,
-                        field: searchField
+                        search: submittedSearchQuery,
+                        field: submittedSearchField
                     },
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
@@ -99,7 +101,7 @@ export const PostsTable = () => {
             setError("No authentication token found. Please login.");
             setLoading(false);
         }
-    }, [authToken, currentPage, itemsPerPage, searchQuery, searchField]);
+    }, [authToken, currentPage, itemsPerPage, submittedSearchQuery, submittedSearchField, be_site]);
 
     const handlePageChange = (page) => {
         setCurrentPage(parseInt(page));
@@ -122,13 +124,13 @@ export const PostsTable = () => {
     //     }
     // }
 
-    const truncateSentence = (sentence, maxLength = 60) => {
-        if (sentence.length > maxLength) {
-            return sentence.slice(0, maxLength) + ". . . .";
-        }
+    // const truncateSentence = (sentence, maxLength = 60) => {
+    //     if (sentence.length > maxLength) {
+    //         return sentence.slice(0, maxLength) + ". . . .";
+    //     }
 
-        return sentence;
-    }
+    //     return sentence;
+    // }
 
     const capitalizeLetter = (string) => {
         if (!string) {
@@ -205,6 +207,8 @@ export const PostsTable = () => {
     const handleSearch = (event) => {
         event.preventDefault();
         setCurrentPage(1);
+        setSubmittedSearchQuery(searchQuery);
+        setSubmittedSearchField(searchField);
     };
 
     return (
@@ -263,12 +267,26 @@ export const PostsTable = () => {
                             placeholder="Search posts..."
                             className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
-                        {/* <button
+                        <button
                             type="submit"
-                            className="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="flex items-center justify-center px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition-colors duration-300 ease-in-out"
                         >
-                            Search
-                        </button> */}
+                            <svg 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                fill="none" 
+                                viewBox="0 0 24 24" 
+                                strokeWidth={1.5} 
+                                stroke="currentColor" 
+                                className="w-5 h-5 mr-2"
+                            >
+                                <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" 
+                                />
+                            </svg>
+                            <span className="font-medium">Search</span>
+                        </button>
                     </form>
                 </div>
 
@@ -298,7 +316,7 @@ export const PostsTable = () => {
                                     <td className="pr-6 py-4 whitespace-nowrap">{formatDate(item.created_at)}</td>
                                     <td className="pr-6 py-4 whitespace-nowrap">
                                         <span className={`px-3 py-2 rounded-full font-semibold text-xs ${
-                                            item.status == "published"
+                                            item.status === "published"
                                                 ? "text-green-600 bg-green-50"
                                                 : "text-blue-600 bg-blue-50"
                                         }`}>
