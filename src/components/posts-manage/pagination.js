@@ -64,7 +64,7 @@ export const Pagination = ({ currentPage, itemsPerPage, totalItems, onPageChange
                                             <button
                                                 onClick={() => handlePageClick(item)}
                                                 aria-current={currentPage == item ? "page" : false}
-                                                className={`px-3 py-2 rounded-lg duration-150 hover:text-white hover:bg-indigo-600 ${currentPage == item ? "bg-indigo-600 text-white font-medium" : ""}`}
+                                                className={`px-3 py-2 rounded-lg duration-150 hover:text-white hover:bg-green-600 ${currentPage == item ? "bg-green-400 text-white font-medium" : ""}`}
                                             >
                                                 {item}
                                             </button>

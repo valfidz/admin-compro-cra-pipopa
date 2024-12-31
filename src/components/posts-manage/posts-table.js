@@ -18,6 +18,10 @@ export const PostsTable = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState(null);
 
+    // Search states
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchField, setSearchField] = useState('all');
+
     // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
@@ -63,7 +67,9 @@ export const PostsTable = () => {
                 const response = await axios.get(`${be_site}/api/posts`, {
                     params: {
                         page: currentPage,
-                        limit: itemsPerPage
+                        limit: itemsPerPage,
+                        search: searchQuery,
+                        field: searchField
                     },
                     headers: {
                         'Authorization': `Bearer ${authToken}`,
@@ -93,7 +99,7 @@ export const PostsTable = () => {
             setError("No authentication token found. Please login.");
             setLoading(false);
         }
-    }, [authToken, currentPage, itemsPerPage]);
+    }, [authToken, currentPage, itemsPerPage, searchQuery, searchField]);
 
     const handlePageChange = (page) => {
         setCurrentPage(parseInt(page));
@@ -188,13 +194,18 @@ export const PostsTable = () => {
         );
     }
 
-    if (tableItems.length === 0) {
-        return <div className="text-center mt-10 text-gray-500">No posts available.</div>;
-    }
+    // if (tableItems.length === 0) {
+    //     return <div className="text-center mt-10 text-gray-500">No posts available.</div>;
+    // }
 
     if (error) {
         return <div className="text-center mt-10 text-red-500">{error}</div>
     }
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        setCurrentPage(1);
+    };
 
     return (
         <>
@@ -220,7 +231,7 @@ export const PostsTable = () => {
                     <div className="mt-3 md:mt-0">
                         <Link
                             to="/create-post"
-                            className="inline-flex items-center px-4 py-2 text-white duration-150 font-medium bg-indigo-600 rounded-lg hover:bg-indigo-500 active:bg-indigo-700 md:text-sm"
+                            className="inline-flex items-center px-4 py-2 text-white duration-150 font-medium bg-green-500 rounded-lg hover:bg-green-700 active:bg-indigo-700 md:text-sm"
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-6 w-6 mr-2">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
@@ -229,12 +240,45 @@ export const PostsTable = () => {
                         </Link>
                     </div>
                 </div>
+
+                {/* Search Field */}
+                <div className="mt-10">
+                    <form onSubmit={handleSearch} className="flex gap-4">
+                        <select
+                            value={searchField}
+                            onChange={(e) => setSearchField(e.target.value)}
+                            className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        >
+                            <option value="all">All Fields</option>
+                            <option value="title">Title</option>
+                            <option value="category">Category</option>
+                            <option value="status">Status</option>
+                            <option value="author">Author</option>
+                            <option value="date">Date</option>
+                        </select>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Search posts..."
+                            className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        />
+                        {/* <button
+                            type="submit"
+                            className="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        >
+                            Search
+                        </button> */}
+                    </form>
+                </div>
+
+                {/* Table field */}
                 <div className="mt-12 relative h-max overflow-auto">
                     <table className="w-full table-auto text-sm text-left">
                         <thead className="text-gray-600 font-medium border-b">
                             <tr>
                                 <th className="py-3 pr-6">Title</th>
-                                <th className="py-3 pr-6">Caategory</th>
+                                <th className="py-3 pr-6">Category</th>
                                 <th className="py-3 pr-6">Date</th>
                                 <th className="py-3 pr-6">Status</th>
                                 <th className="py-3 pr-6">Author</th>
@@ -261,7 +305,7 @@ export const PostsTable = () => {
                                             {item.status}
                                         </span>
                                     </td>
-                                    <td className="pr-6 py-4 whitespace-nowrap">{item.author}</td>
+                                    <td className="pr-6 py-4 whitespace-nowrap max-w-xs text-wrap break-words">{item.author}</td>
                                     <td className="pr-6 py-4 whitespace-nowrap">
                                         {item.featured_image ? (
                                             <img
