@@ -6,19 +6,22 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import Failed from "../alerts/failAlert";
 import { Link } from "react-router-dom";
+import TagInput from "./form-input/multiple_value";
 
 const PostForm = () => {
-  const [formData, setFormData] = useState({
+    const user = JSON.parse(Cookies.get('user'));
+    const [formData, setFormData] = useState({
     title: "",
     category: "",
     featuredImage: null,
     content: "",
-    author: "",
+    author: user.username,
     meta_title: "",
     meta_description: "",
-    keywords: "",
     status: "draft" // Add default status
   });
+  const [tags, setTags] = useState([]);
+  const [keywords, setKeywords] = useState([]);
   const [categories, setCategories] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
@@ -78,6 +81,9 @@ const PostForm = () => {
       data.append(key, formData[key]);
     });
 
+    data.append('keywords', keywords.join(','));
+    data.append('tags', tags.join(','));
+
     try {
       const response = await axios.post(`${be_url}/api/posts`, data, {
         headers: {
@@ -87,7 +93,6 @@ const PostForm = () => {
       });
 
       if (response.status === 200 || response.status === 201) {
-        // alert("Post created successfully!");
         sessionStorage.setItem('postNotification', 'true');
 
         navigate('/manage-posts')
@@ -98,7 +103,6 @@ const PostForm = () => {
       console.error("Error submitting the form:", error);
       setErrorMessage("An error occured while submitting the form.");
       setShowError(true);
-    //   alert("An error occurred while submitting the form.");
     }
   };
 
@@ -288,14 +292,24 @@ const PostForm = () => {
             <label className="block text-sm font-medium mb-1" htmlFor="keywords">
             Keywords
             </label>
-            <input
-            type="text"
-            id="keywords"
-            name="keywords"
-            className="w-full p-2 border border-gray-300 rounded-md"
-            value={formData.keywords}
-            onChange={handleInputChange}
+            <TagInput
+                tags={keywords}
+                setTags={setKeywords}
+                name="keywords"
+                placeholder="Type and press comma or enter to add keywords"
             />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium mb-1" htmlFor="tags">
+            Tags
+          </label>
+          <TagInput 
+            tags={tags} 
+            setTags={setTags}
+            name="tags"
+            placeholder="Type and press comma or enter to add tags"
+          />
         </div>
 
         <button
