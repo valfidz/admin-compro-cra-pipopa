@@ -114,7 +114,7 @@ export const Post = (props) => {
                         {/* Content overlay */}
                         <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
                             <div className="max-w-3xl">
-                                <span className="inline-flex px-3 py-1 text-sm font-medium text-white bg-yellow-500 rounded-full mb-3">
+                                <span className="inline-flex px-3 py-1 text-sm font-medium text-white bg-teal-500 rounded-full mb-3">
                                     {capitalizeLetter(postDetail.category_name || 'Uncategorized')}
                                 </span>
                                 
