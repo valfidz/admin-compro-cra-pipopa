@@ -9,6 +9,9 @@ import { RegistrationPage } from './pages/registration';
 import { RouteAuth } from './auth/routeAuth';
 import { NotFoundPage } from './pages/notFound';
 import { CreatePostForm } from './pages/createPost';
+import { CategoriesManage } from './pages/categoriesList';
+import { CreateCategoryForm } from './pages/createCategories';
+import { EditCategoryForm } from './pages/editCategories';
 
 function App() {
   return (
@@ -38,6 +41,21 @@ function App() {
           <Route path='/edit-post/:id' element={
             <RouteAuth>
               <EditPostForm />
+            </RouteAuth>
+            } />
+          <Route path='/categories' element={
+            <RouteAuth>
+              <CategoriesManage />
+            </RouteAuth>
+            } />
+          <Route path='/create-category' element={
+            <RouteAuth>
+              <CreateCategoryForm />
+            </RouteAuth>
+            } />
+          <Route path='/edit-categories/:id' element={
+            <RouteAuth>
+              <EditCategoryForm />
             </RouteAuth>
             } />
           <Route path='/login' element={<LoginPage />} />
