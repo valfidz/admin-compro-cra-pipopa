@@ -70,7 +70,8 @@ const EditablePost = (props) => {
     const fetchCategories = async () => {
         try {
             const response = await axios.get(`${be_url}/api/categories`);
-            setCategories(response.data.result);
+            const categoriesData = Array.isArray(response.data.result.result) ? response.data.result.result : [];
+            setCategories(categoriesData);
         } catch (error) {
             console.error("Error fetching categories:", error);
         }
