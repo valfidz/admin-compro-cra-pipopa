@@ -89,7 +89,7 @@ const Sidebar = (props) => {
                             </ul>
                             <div className="py-4 px-4 border-t">
                                 <div className="flex items-center gap-x-4">
-                                    <img src="/vertikal_logo.jpg" className="w-12 h-12 rounded-full" alt="User profile" />
+                                    <img src="/cropped_logo.png" className="w-12 h-12 rounded-full" alt="User profile" />
                                     <div>
                                         <span className="block text-gray-700 text-sm font-semibold">{user.username}</span>
                                         <a href="" className="block mt-px text-gray-600 hover:text-indigo-600 text-xs">

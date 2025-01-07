@@ -124,7 +124,7 @@ export const Post = (props) => {
                                 
                                 <div className="flex items-center">
                                     <img 
-                                        src="/vertikal_logo.jpg"
+                                        src="/cropped_logo.png"
                                         alt="Author profile"
                                         className="h-8 w-8 sm:h-10 sm:w-10 rounded-full mr-3 object-cover border border-white/50" 
                                     />
