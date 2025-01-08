@@ -32,6 +32,23 @@ const EditablePost = (props) => {
 
   const be_url = process.env.REACT_APP_BE_SITE;
 
+  const parseArrayData = (data) => {
+    if (!data) return [];
+
+    if (Array.isArray(data)) return data;
+
+    if (typeof data === 'string') {
+      try {
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : data.split(',').map(item => item.trim());
+      } catch (error) {
+        return data.split(',').map(item => item.trim()).filter(item => item !== '');
+      }
+    }
+
+    return [];
+  }
+
   useEffect(() => {
     const fetchPostData = async () => {
         try {
@@ -39,6 +56,7 @@ const EditablePost = (props) => {
                 headers: {'Authorization': `Bearer ${authToken}`}
             });
             const data = response.data;
+
             setFormData({
                 title: data.title,
                 category: data.category_id,
@@ -49,10 +67,10 @@ const EditablePost = (props) => {
                 meta_description: data.meta_description,
                 status: data.status
             })
-            setTags(Array.isArray(data.tags) ? data.tags
-                        : (typeof data.tags == 'string' ? data.tags.split(',') : []));
-            setKeywords(Array.isArray(data.keywords) ? data.keywords
-                        : (typeof data.keywords == 'string' ? data.keywords.split(',') : []));
+
+            setTags(parseArrayData(data.tags));
+            setKeywords(parseArrayData(data.keywords));
+
             setPreviewImage(data.featured_image);
         } catch (error) {
             console.error("Error fetching post data", error);

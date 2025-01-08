@@ -11,6 +11,20 @@ export const Post = (props) => {
     const [postDetail, setPostDetail] = useState({});
     const [imageName, setImageName] = useState('');
 
+    const parseArrayData = (data) => {
+        if (!data) return [];
+        if (Array.isArray(data)) return data;
+        if (typeof data === 'string') {
+            try {
+                const parsed = JSON.parse(data);
+                return Array.isArray(parsed) ? parsed : data.split(',').map(item => item.trim());
+            } catch (e) {
+                return data.split(',').map(item => item.trim()).filter(item => item !== '');
+            }
+        }
+        return [];
+    };
+
     useEffect(() => {
         let isMounted = true;
 
@@ -21,7 +35,12 @@ export const Post = (props) => {
                 });
         
                 if (isMounted) {
-                    setPostDetail(response.data);
+                    const processedData = {
+                        ...response.data,
+                        tags: parseArrayData(response.data.tags),
+                        keywords: parseArrayData(response.data.keywords)
+                    }
+                    setPostDetail(processedData);
                     setImageName(response.data.featured_image);
                 }
             } catch (error) {
@@ -58,8 +77,8 @@ export const Post = (props) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
       }
 
-    const hasTags = postDetail.tags && Array.isArray(postDetail.tags) && postDetail.tags.length > 0;
-    const hasKeywords = postDetail.keywords && Array.isArray(postDetail.keywords) && postDetail.keywords.length > 0;
+    const hasTags = postDetail.tags && postDetail.tags.length > 0;
+    const hasKeywords = postDetail.keywords && postDetail.keywords.length > 0;
 
     return (
         <>
